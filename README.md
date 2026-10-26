@@ -8,8 +8,8 @@ today · $0.20 · 379 calls · claude 80%
 
 ## Features
 
-- **`Usage` on the bottom menu row** — styled like the host's own menu items (same spacing, muted color, hover); click it for a compact popover anchored just above the footer: today's cost/calls/quota plus the top 5 models with names on the left and calls/cost right-aligned.
-- **Details on demand** — `Ctrl+P` → **Usage: show report** (the default command palette, no extra keybind) opens the full dialog with aligned model rows, and `/usage` posts the 30-day table.
+- **`Usage` on the bottom menu row** — styled like the host's own menu items (same spacing, muted color, hover); click it for a compact popover anchored just above the footer: today's cost/calls plus the top 5 models (names left, calls/cost right-aligned) and a **Details** button.
+- **Details on demand** — the popover's **Details** button, or `Ctrl+P` → **Usage: show report** (the default command palette, no extra keybind), opens the full dialog with quota and aligned model rows; `/usage` posts the 30-day table.
 - **No chat/sidebar duplication** — the conversation footer and the task-detail sidebar stay clean.
 - **`/usage` command** — a full per-model table inside the session (no extra model call; it posts the report directly).
 - **`usage_report` tool** — the agent can answer "how much have I used / spent?" with the same numbers.
@@ -58,6 +58,7 @@ This installs the package into OpenCode's plugin cache and loads its `./tui` exp
 | What | How |
 | --- | --- |
 | Compact popover | Click `Usage` (right after `Experiments`) — models left, usage right |
+| Full dialog | Click **▸ Details** in the popover |
 | Detailed dialog | `Ctrl+P` → **Usage: show report** (default command palette) |
 | Full report (30 days) | `/usage` |
 | Custom window | `/usage --days 7`, `/usage --days 0` (today) |
@@ -77,7 +78,7 @@ Example report:
 ## Where it appears
 
 - **Bottom menu row** (`✓ Server  ○ UI  Theme  Tools  Experiments  Usage`): the host owns that row and exposes no plugin slot for it, so the plugin draws an absolute overlay after `Experiments`, with the same two-space gap, muted color and hover highlight as the host items. It is hidden on terminals narrower than 60 columns.
-- **Click** opens a compact popover anchored above the footer (like the host's `UI` menu); clicking outside or pressing `Esc` closes it. **Details stay behind the keyboard shortcut.**
+- **Click** opens a compact popover anchored above the footer (like the host's `UI` menu) with a **▸ Details** button; clicking outside or pressing `Esc` closes it.
 - **Conversation footer and task-detail sidebar**: intentionally untouched (`prompt.footer.status` and `sidebar.footer` are not used).
 - **Command palette**: `Ctrl+P` → “Usage: show report” works anywhere and does not depend on the overlay.
 - **Data**: the entry only opens a dialog; the numbers live in the dialog and in `/usage`.

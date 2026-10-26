@@ -127,15 +127,12 @@ export default Plugin.define({
       if (!current) await refresh()
 
       const s = current
-      const buckets = (s?.quota ?? []).flatMap((a) => a.buckets ?? []).slice(0, 3)
       const top = [...(s?.models ?? [])].sort((a, b) => b.calls - a.calls).slice(0, 5)
       const lines = [
         `Today   ${money(s?.cost ?? 0)} · ${count(s?.calls ?? 0)} calls`,
-        buckets.length > 0 ? buckets.map((b) => `${b.name} ${b.percent}%`).join(" · ") : "no quota data",
         ...top.map((m) => row(shortModel(m.key), m.calls, m.cost)),
-        "Ctrl+P → details",
       ]
-      const width = Math.max(...lines.map((line) => line.length)) + 4
+      const width = Math.max(...lines.map((line) => line.length), "▸ Details".length) + 4
       const cols = (process.stdout as any).columns ?? 80
       const left = Math.max(1, Math.min(MENU_END + 2, cols - width - 1))
 
@@ -154,7 +151,7 @@ export default Plugin.define({
         left,
         bottom: 1,
         width,
-        height: lines.length + 2,
+        height: lines.length + 3,
         zIndex: 1001,
         border: true,
         flexDirection: "column",
@@ -173,6 +170,26 @@ export default Plugin.define({
           }),
         )
       }
+
+      const details = new TextRenderable(renderer, {
+        content: "▸ Details",
+        selectable: false,
+        ...(muted ? { fg: muted } : {}),
+        onMouseOver: () => {
+          if (base) details.fg = base
+          renderer.requestRender?.()
+        },
+        onMouseOut: () => {
+          if (muted) details.fg = muted
+          renderer.requestRender?.()
+        },
+        onMouseUp: (event: any) => {
+          event?.preventDefault?.()
+          closePopup()
+          void showDetails()
+        },
+      })
+      popup.add(details)
 
       renderer.root.add(backdrop)
       renderer.root.add(popup)

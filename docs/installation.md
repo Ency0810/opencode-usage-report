@@ -81,8 +81,8 @@ Expected shape:
 
 Then verify in the TUI:
 
-1. **Bottom menu row** — it reads `✓ Server  ○ UI  Theme  Tools  Experiments  Usage`, with the same two-space gap, muted color and hover highlight as the host items. Click `Usage`: a compact popover opens just above the footer with today's cost, calls, quota and the top 5 models (names left, calls/cost right-aligned). Click outside or press `Esc` to close. (The row is host-owned and has no plugin slot, so the plugin draws an absolute overlay after `Experiments`; it is hidden below 60 columns.)
-2. **Detailed dialog** — `Ctrl+P` → `Usage: show report` (the default command palette, no extra keybind) opens the full dialog with aligned model rows, full quota and the `/usage` hint. Details are intentionally keyboard-only.
+1. **Bottom menu row** — it reads `✓ Server  ○ UI  Theme  Tools  Experiments  Usage`, with the same two-space gap, muted color and hover highlight as the host items. Click `Usage`: a compact popover opens just above the footer with today's cost, calls and the top 5 models (names left, calls/cost right-aligned), plus a **▸ Details** button. Click outside or press `Esc` to close. (The row is host-owned and has no plugin slot, so the plugin draws an absolute overlay after `Experiments`; it is hidden below 60 columns.)
+2. **Detailed dialog** — click **▸ Details** in the popover, or use `Ctrl+P` → `Usage: show report` (the default command palette, no extra keybind). It shows the full quota, aligned model rows and the `/usage` hint.
 3. **Chat footer and task-detail sidebar** — intentionally clean; the plugin does not hook `prompt.footer.status` or `sidebar.footer`.
 4. **In a session** — run `/usage`; a per-model table is posted directly into the conversation.
 5. Optionally ask the agent: "show my model usage" — it should call `usage_report`.

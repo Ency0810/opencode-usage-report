@@ -1,6 +1,6 @@
 {
   "name": "opencode-usage-report",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Per-model token usage, cost and Antigravity quota for OpenCode: /usage command, usage_report tool, a clickable usage entry drawn on the bottom menu row.",
   "type": "module",
   "exports": {
