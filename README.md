@@ -1,39 +1,57 @@
 # opencode-usage-report
 
-Per-model token usage, cost and Antigravity quota for [OpenCode](https://opencode.ai) — one click away in the TUI footer menu row, plus a `/usage` command.
+讓 [OpenCode](https://opencode.ai) 在**底部選單列**提供一個可點的 `Usage`，點擊後彈出簡約用量小窗；完整細節放在小窗內的 `▸ Details`。
 
 ```
-today · $0.20 · 379 calls · claude 80%
+✓ Server  ○ UI  Theme  Tools  Experiments  Usage
 ```
 
-## Features
+```
+┌─────────────────────────────────────────────┐
+│ Today   $0.38 · 497 calls                   │
+│ deepseek-flash                 296    $0.38 │
+│ deepseek-v4.1-flash-free       147       $0 │
+│ claude-opus-5-5-high            30       $0 │
+│ gemini-3.5-flash-lite           11       $0 │
+│ gemini-4-argon-high              7       $0 │
+│ ▸ Details                                   │
+└─────────────────────────────────────────────┘
+```
 
-- **`Usage` on the bottom menu row** — styled like the host's own menu items (same spacing, muted color, hover); click it for a compact popover anchored just above the footer: today's cost/calls plus the top 5 models (names left, calls/cost right-aligned) and a **Details** button.
-- **Details on demand** — the popover's **Details** button, or `Ctrl+P` → **Usage: show report** (the default command palette, no extra keybind), opens the full dialog with quota and aligned model rows; `/usage` posts the 30-day table.
-- **No chat/sidebar duplication** — the conversation footer and the task-detail sidebar stay clean.
-- **`/usage` command** — a full per-model table inside the session (no extra model call; it posts the report directly).
-- **`usage_report` tool** — the agent can answer "how much have I used / spent?" with the same numbers.
-- **Per-model breakdown** — calls, input / output / reasoning tokens, cache read/write, and estimated cost.
-- **Subscription aware** — Antigravity (`google/antigravity-*`) models are reported as **$0** and their remaining quota is shown instead, so a subscription never looks like an API bill.
-- Read-only: no network requests, no session writes.
+## 功能
 
-## Requirements
+- **底部 `Usage` 入口**：緊接在 `Experiments` 後面，沿用主機選單相同的兩格間距、灰色與 hover 效果。
+- **點擊 → 簡約小窗**：今天的成本、呼叫次數、前 5 名模型（模型名稱靠左、呼叫數與成本靠右），底部有 `▸ Details` 按鈕；點小窗外或按 `Esc` 關閉。
+- **`▸ Details` → 完整對話框**：Antigravity 配額、前 8 名模型（同樣左名稱、右用量）、`/usage` 提示。
+- **`/usage` 指令**：完整 30 天表格直接貼進對話，不會額外呼叫模型。
+- **`usage_report` 工具**：可以直接問 agent「我用了多少 / 花多少錢」。
+- **訂閱友善**：`google/antigravity-*` 一律顯示 `$0`，並改為顯示剩餘配額，不會把訂閱誤看成 API 帳單。
+- **唯讀**：不連網、不寫入 session，只讀用量資料與配額檔。
 
-- OpenCode **2.x** (uses the V2 server plugin and CLI plugin APIs).
-- Optional: `opencode-antigravity-auth`, for the quota section. Without it the rest works fine.
+## 需求
 
-## Install
+- OpenCode **2.x**（使用 V2 的 server plugin 與 CLI plugin API）
+- 選用：`opencode-antigravity-auth`（才會有配額資訊；沒有也能正常使用其他功能）
 
-### Let an agent do it (recommended)
+## 安裝
 
-Paste this into OpenCode, Claude Code, Codex, Cursor, or any agent session:
+### 交給 agent 安裝（推薦）
+
+把下面這段貼進 OpenCode、Claude Code、Codex、Cursor 或任何 agent：
 
 ```
 Install and configure opencode-usage-report for OpenCode by following the instructions here:
 https://raw.githubusercontent.com/Ency0810/opencode-usage-report/main/docs/installation.md
 ```
 
-### Manual (two files)
+或中文版：
+
+```
+請依照以下說明安裝並設定 opencode-usage-report：
+https://raw.githubusercontent.com/Ency0810/opencode-usage-report/main/docs/installation.md
+```
+
+### 手動安裝（兩個檔案）
 
 ```bash
 mkdir -p ~/.config/opencode/plugins/usage-report
@@ -43,76 +61,72 @@ curl -fsSL https://raw.githubusercontent.com/Ency0810/opencode-usage-report/main
   -o ~/.config/opencode/plugins/usage-report/tui.tsx
 ```
 
-Then restart OpenCode. OpenCode discovers plugins under `~/.config/opencode/plugins/` automatically — no `opencode.json` change needed.
+重新啟動 OpenCode 即可。`~/.config/opencode/plugins/` 下的目錄會被自動探索，**不需要**改 `opencode.json`。
 
-### GitHub package install
+### 套件形式
 
 ```bash
 opencode plugin add github:Ency0810/opencode-usage-report
 ```
 
-This installs the package into OpenCode's plugin cache and loads its `./tui` export for the bottom-row entry (verified: the server entrypoint loads and writes the snapshot; restart the TUI to attach the entry). The two-file method above is the most predictable if the entry does not appear.
+會安裝到 OpenCode 的 plugin cache 並載入 `./tui`。這個方式和上面的兩檔案方式**只能選一種**，同時用會重複註冊。
 
-## Usage
+## 使用
 
-| What | How |
+| 想做什麼 | 怎麼做 |
 | --- | --- |
-| Compact popover | Click `Usage` (right after `Experiments`) — models left, usage right |
-| Full dialog | Click **▸ Details** in the popover |
-| Detailed dialog | `Ctrl+P` → **Usage: show report** (default command palette) |
-| Full report (30 days) | `/usage` |
-| Custom window | `/usage --days 7`, `/usage --days 0` (today) |
-| Ask the agent | "show my model usage and cost" |
-| Tool | `usage_report` with `days` and `refresh` |
+| 簡約小窗 | 點底部 `Experiments` 後面的 `Usage`（模型名稱左、用量右） |
+| 完整對話框 | 點小窗裡的 **▸ Details** |
+| 完整報表（30 天） | `/usage` |
+| 自訂期間 | `/usage --days 7`、`/usage --days 0`（今天） |
+| 問 agent | 「顯示我的模型用量與花費」 |
+| 工具 | `usage_report`（參數 `days`、`refresh`） |
 
-Example report:
+## 顯示位置
 
-```
-### 模型用量（最近 30 天）
-| 模型 | 呼叫 | Input | Output | Reasoning | Cache read | Cache write | 成本 |
-| deepseek/deepseek-flash                    | 167 | 473,965 | 42,786 | 54,967 | 16,996,736 | 0 | $0.18 |
-| antigravity-claude-opus-5-5-high（訂閱）     |  30 |  89,639 |  8,150 |      0 |    277,845 | 0 | $0    |
-...
-```
+- **最底部選單列**（`✓ Server  ○ UI  Theme  Tools  Experiments  Usage`）：那一列由 OpenCode 主機管理，插件沒有對應的 slot，所以用絕對定位 overlay 畫在 `Experiments` 後面，並套用相同的兩格間距、灰色與 hover；終端寬度小於 60 欄時自動隱藏。
+- **聊天底部與右側任務詳情欄**：刻意不使用（沒有掛 `prompt.footer.status` 或 `sidebar.footer`）。
+- **沒有額外快捷鍵**：詳情只透過小窗內的 `▸ Details` 開啟。
+- **數字只在小窗、Details 與 `/usage` 裡**。
 
-## Where it appears
+## 成本怎麼算
 
-- **Bottom menu row** (`✓ Server  ○ UI  Theme  Tools  Experiments  Usage`): the host owns that row and exposes no plugin slot for it, so the plugin draws an absolute overlay after `Experiments`, with the same two-space gap, muted color and hover highlight as the host items. It is hidden on terminals narrower than 60 columns.
-- **Click** opens a compact popover anchored above the footer (like the host's `UI` menu) with a **▸ Details** button; clicking outside or pressing `Esc` closes it.
-- **Conversation footer and task-detail sidebar**: intentionally untouched (`prompt.footer.status` and `sidebar.footer` are not used).
-- **Command palette**: `Ctrl+P` → “Usage: show report” works anywhere and does not depend on the overlay.
-- **Data**: the entry only opens a dialog; the numbers live in the dialog and in `/usage`.
+- Token 數與 `cost` 來自 OpenCode 存在每個 session 的 assistant 訊息。
+- 一般 provider 的 `cost` 是 OpenCode 依 [models.dev](https://models.dev) 單價估算的**參考值**，不是帳單。
+- `google/antigravity-*` 一律 `$0`：那是 Google Antigravity 訂閱配額，不是 API 計費；小窗與 Details 會改顯示 `~/.config/opencode/antigravity-accounts.json` 裡的剩餘配額。
+- 小窗與 Details 算的是**今天**（本地午夜起）；`/usage` 預設 30 天。
 
-## How cost is calculated
+## 設定（全部選用）
 
-- Token counts and `cost` come from the assistant messages OpenCode stores for every session.
-- For normal providers, `cost` is OpenCode's estimate using [models.dev](https://models.dev) pricing — a reference value, not an invoice.
-- For `google/antigravity-*` models, cost is always `$0`: they consume the Google Antigravity subscription quota, not API billing. The report and the dialog show the remaining quota buckets from `~/.config/opencode/antigravity-accounts.json` instead.
-- The dialog uses **today** (local midnight); `/usage` defaults to 30 days.
-
-## Configuration
-
-All optional:
-
-| Variable | Default | Purpose |
+| 變數 | 預設值 | 用途 |
 | --- | --- | --- |
-| `OPENCODE_USAGE_REPORT_DIR` | `~/.cache/opencode/usage-report` | Where `status.json` (the TUI snapshot) is written |
-| `OPENCODE_USAGE_REPORT_STATUS` | `<dir>/status.json` | Exact snapshot path read by the TUI entry |
-| `OPENCODE_USAGE_REPORT_ANTIGRAVITY_ACCOUNTS` | `~/.config/opencode/antigravity-accounts.json` | Quota source |
+| `OPENCODE_USAGE_REPORT_DIR` | `~/.cache/opencode/usage-report` | 小窗快照 `status.json` 的目錄 |
+| `OPENCODE_USAGE_REPORT_STATUS` | `<dir>/status.json` | 小窗實際讀取的路徑 |
+| `OPENCODE_USAGE_REPORT_ANTIGRAVITY_ACCOUNTS` | `~/.config/opencode/antigravity-accounts.json` | 配額來源 |
 
-Refresh intervals: the TUI re-reads the snapshot every 15s; the snapshot is recomputed every 5 minutes and whenever `/usage` runs.
+更新頻率：小窗每 15 秒重讀快照；快照每 5 分鐘重算，執行 `/usage` 時也會立即重算。
 
-## Uninstall
+## 移除
 
 ```bash
 rm -rf ~/.config/opencode/plugins/usage-report
 rm -rf ~/.cache/opencode/usage-report
 ```
 
-If you installed the package form, also run `opencode plugin remove opencode-usage-report`.
+套件形式另加：
 
-## License
+```bash
+opencode plugin remove opencode-usage-report
+```
 
-MIT — see [LICENSE](LICENSE).
+## 開發與發佈
 
-[繁體中文說明](README.zh-TW.md)
+- CI：push / PR 會跑 `bunx tsc --noEmit`（`.github/workflows/ci.yml`）。
+- 發佈：推 `v*` tag 時觸發 `.github/workflows/publish.yml`；需要在 repo secrets 設定 `NPM_TOKEN`，否則會安全跳過。
+- 原始碼主要在 `index.ts`（server）與 `tui.tsx`（TUI）。
+
+## 授權
+
+MIT，詳見 [LICENSE](LICENSE)。
+
+[English README](README.en.md)

@@ -2,7 +2,7 @@
  * usage-report TUI — a `Usage` entry on the bottom-most menu row.
  *
  * Click: a small popover anchored just above the footer (like the host's `UI`
- * menu). Keyboard (palette: "Usage: show report"): the detailed dialog.
+ * menu), with a Details button that opens the full dialog.
  *
  * The host owns that row and exposes no plugin slot, so the entry is drawn as an
  * absolute overlay one cell after `Experiments`.
@@ -243,16 +243,6 @@ export default Plugin.define({
       mode: "global",
       priority: 5,
       commands: [
-        {
-          id: "usage-report.show",
-          title: "Usage: show report",
-          group: "Usage",
-          palette: true,
-          run: () => {
-            closePopup()
-            void showDetails()
-          },
-        },
         {
           id: "usage-report.close",
           bind: "escape",
