@@ -43,13 +43,13 @@ curl -fsSL https://raw.githubusercontent.com/Ency0810/opencode-usage-report/main
 
 Then restart OpenCode. OpenCode discovers plugins under `~/.config/opencode/plugins/` automatically — no `opencode.json` change needed.
 
-### GitHub package install (experimental)
+### GitHub package install
 
 ```bash
 opencode plugin add github:Ency0810/opencode-usage-report
 ```
 
-This installs the package into OpenCode's plugin cache and loads `./tui` for the footer. The two-file method above is the most predictable.
+This installs the package into OpenCode's plugin cache and loads its `./tui` export for the footer (verified: the server entrypoint loads and writes the snapshot; restart the TUI to attach the footer). The two-file method above is the most predictable if the footer does not appear.
 
 ## Usage
 

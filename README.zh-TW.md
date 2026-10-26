@@ -43,7 +43,7 @@ curl -fsSL https://raw.githubusercontent.com/Ency0810/opencode-usage-report/main
 
 重新啟動 OpenCode 即可。`~/.config/opencode/plugins/` 下的目錄會被自動探索，**不需要**改 `opencode.json`。
 
-### 套件形式（實驗中）
+### 套件形式
 
 ```bash
 opencode plugin add github:Ency0810/opencode-usage-report
