@@ -8,7 +8,8 @@ today · $0.20 · 379 calls · claude 80%
 
 ## Features
 
-- **TUI footer status line** — today's estimated cost, model calls, and remaining Antigravity `claude` quota, refreshed every 15 seconds.
+- **Task-detail sidebar line** — today's estimated cost, model calls, and remaining Antigravity `claude` quota, refreshed every 15 seconds. No chat-footer clutter.
+- **Clickable `usage` on the home footer** — click the `usage` entry (or run the palette command **Usage: show report**) for a summary dialog.
 - **`/usage` command** — a full per-model table inside the session (no extra model call; it posts the report directly).
 - **`usage_report` tool** — the agent can answer "how much have I used / spent?" with the same numbers.
 - **Per-model breakdown** — calls, input / output / reasoning tokens, cache read/write, and estimated cost.
@@ -55,7 +56,9 @@ This installs the package into OpenCode's plugin cache and loads its `./tui` exp
 
 | What | How |
 | --- | --- |
-| Footer status | Automatic after install + restart |
+| Home footer | Click `usage` for the summary dialog |
+| Task-detail sidebar | Automatic in a session (right panel) |
+| Command palette | `Ctrl+P` → **Usage: show report** |
 | Full report (30 days) | `/usage` |
 | Custom window | `/usage --days 7`, `/usage --days 0` (today) |
 | Ask the agent | "show my model usage and cost" |
@@ -70,6 +73,13 @@ Example report:
 | antigravity-claude-opus-5-5-high（訂閱）     |  30 |  89,639 |  8,150 |      0 |    277,845 | 0 | $0    |
 ...
 ```
+
+## Where it appears
+
+- **Home footer status row**: a clickable `usage` entry. The host owns the `Server / UI / Theme / Tools / Experiments` menu row, so plugins append to the status row next to it (there is no slot for that menu row).
+- **Session task-detail sidebar** (`sidebar.footer`): the full `today · $… · N calls · claude N%` line.
+- **No chat footer**: deliberately not attached to `prompt.footer.status`, so the conversation area stays clean.
+- **Command palette**: `Ctrl+P` → “Usage: show report” works anywhere, even with the sidebar closed.
 
 ## How cost is calculated
 

@@ -81,11 +81,13 @@ Expected shape:
 
 Then verify in the TUI:
 
-1. The footer shows a segment like `today · $0.20 · 379 calls · claude 80%` (home screen, session screen, and sidebar footer).
-2. In a session, run `/usage` — a per-model table is posted directly into the conversation.
-3. Optionally ask the agent: "show my model usage" — it should call `usage_report`.
+1. **Home footer** — a clickable `usage` entry appears in the status row (next to the MCP indicator). Click it: a dialog shows today's totals, remaining Antigravity quota, and the top models. The `Server / UI / Theme / Tools / Experiments` row is host-owned and has no plugin slot, so the entry lives in the status row next to it.
+2. **Session task-detail sidebar** — the right panel shows `today · $0.20 · 379 calls · claude 80%`. The chat footer is intentionally left clean (no `prompt.footer.status` hook).
+3. **Command palette** — `Ctrl+P` → `Usage: show report` opens the same dialog anywhere, including when the sidebar is closed.
+4. **In a session** — run `/usage`; a per-model table is posted directly into the conversation.
+5. Optionally ask the agent: "show my model usage" — it should call `usage_report`.
 
-If the footer is missing but `status.json` exists, the CLI plugin didn't load — see Troubleshooting.
+If the home `usage` entry is missing but `status.json` exists, the CLI plugin didn't load — see Troubleshooting.
 
 ### Step 4 — Optional configuration
 

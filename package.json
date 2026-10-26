@@ -1,7 +1,7 @@
 {
   "name": "opencode-usage-report",
-  "version": "0.1.0",
-  "description": "Per-model token usage, cost and Antigravity quota for OpenCode: /usage command, usage_report tool, and a TUI footer status line.",
+  "version": "0.1.1",
+  "description": "Per-model token usage, cost and Antigravity quota for OpenCode: /usage command, usage_report tool, task-detail sidebar line and a clickable home-footer usage entry.",
   "type": "module",
   "exports": {
     ".": "./index.ts",
@@ -15,6 +15,9 @@
     "docs",
     "LICENSE"
   ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "keywords": [
     "opencode",
     "opencode-plugin",
@@ -32,5 +35,9 @@
   "bugs": {
     "url": "https://github.com/Ency0810/opencode-usage-report/issues"
   },
-  "homepage": "https://github.com/Ency0810/opencode-usage-report#readme"
+  "homepage": "https://github.com/Ency0810/opencode-usage-report#readme",
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
 }
