@@ -27,7 +27,10 @@ const money = (n: number) => (n === 0 ? "$0" : n < 0.01 ? `$${n.toFixed(4)}` : `
 const count = (n: number) => Math.round(n).toLocaleString("en-US")
 const compactTokens = (n: number) =>
   n >= 1_000_000 ? `${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `${(n / 1_000).toFixed(0)}K` : String(n)
-const shortModel = (key: string) => key.replace("google/antigravity-", "").replace(/^google\//, "")
+const shortModel = (key: string) => key.replace(/^[^/]+\//, "").replace(/^antigravity-/, "")
+const NAME_WIDTH = 28
+const row = (name: string, calls: number, cost: number) =>
+  name.slice(0, NAME_WIDTH).padEnd(NAME_WIDTH) + count(calls).padStart(6) + "  " + money(cost).padStart(7)
 
 // " ✓ Server  ○ UI  Theme  Tools  Experiments" ends at column 41.
 const MENU_END = 42
@@ -78,8 +81,8 @@ export default Plugin.define({
 
       const top = [...(s.models ?? [])].sort((a, b) => b.calls - a.calls).slice(0, 8)
       if (top.length > 0) {
-        out.push("Models (calls / cost)")
-        for (const m of top) out.push(`  ${shortModel(m.key)}  ${count(m.calls)} / ${money(m.cost)}`)
+        out.push("Models".padEnd(NAME_WIDTH) + "Calls".padStart(6) + "     Cost")
+        for (const m of top) out.push(row(shortModel(m.key), m.calls, m.cost))
         out.push("")
       }
 
@@ -125,9 +128,11 @@ export default Plugin.define({
 
       const s = current
       const buckets = (s?.quota ?? []).flatMap((a) => a.buckets ?? []).slice(0, 3)
+      const top = [...(s?.models ?? [])].sort((a, b) => b.calls - a.calls).slice(0, 5)
       const lines = [
         `Today   ${money(s?.cost ?? 0)} · ${count(s?.calls ?? 0)} calls`,
         buckets.length > 0 ? buckets.map((b) => `${b.name} ${b.percent}%`).join(" · ") : "no quota data",
+        ...top.map((m) => row(shortModel(m.key), m.calls, m.cost)),
         "Ctrl+P → details",
       ]
       const width = Math.max(...lines.map((line) => line.length)) + 4

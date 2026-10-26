@@ -8,8 +8,8 @@ today · $0.20 · 379 calls · claude 80%
 
 ## 功能
 
-- **最底部選單列的 `Usage`**：與其他項目相同的兩格間距、灰色與 hover 效果；點一下會在 footer 上方彈出簡約小窗（今天成本、呼叫數、配額）。
-- **詳細資訊只在快捷鍵**：`Ctrl+P` → **Usage: show report** 開完整對話框（模型明細＋配額）；`/usage` 則是 30 天表格。
+- **最底部選單列的 `Usage`**：與其他項目相同的兩格間距、灰色與 hover 效果；點一下會在 footer 上方彈出簡約小窗（今天成本、呼叫數、配額，以及前 5 名模型：名稱靠左、用量靠右）。
+- **詳細資訊只在快捷鍵**：`Ctrl+P` → **Usage: show report**（預設 commands，沒有額外 keybind）開完整對話框，模型列同樣名稱左、用量右；`/usage` 則是 30 天表格。
 - **不佔用聊天與側欄**：對話底部與右側任務詳情欄都保持乾淨。
 - **`/usage` 指令**：在對話中直接貼出每個模型的完整用量表（不會額外呼叫模型）。
 - **`usage_report` 工具**：可以直接問 agent「我用了多少 / 花多少錢」。
@@ -57,8 +57,8 @@ opencode plugin add github:Ency0810/opencode-usage-report
 
 | 想做什麼 | 怎麼做 |
 | --- | --- |
-| 簡約小窗 | 點 `Experiments` 後面的 `Usage` |
-| 完整對話框 | `Ctrl+P` → **Usage: show report** |
+| 簡約小窗 | 點 `Experiments` 後面的 `Usage`（模型名稱左、用量右） |
+| 完整對話框 | `Ctrl+P` → **Usage: show report**（預設 commands） |
 | 完整報表（30 天） | `/usage` |
 | 自訂期間 | `/usage --days 7`、`/usage --days 0`（今天） |
 | 問 agent | 「顯示我的模型用量與花費」 |

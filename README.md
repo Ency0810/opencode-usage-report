@@ -8,8 +8,8 @@ today · $0.20 · 379 calls · claude 80%
 
 ## Features
 
-- **`Usage` on the bottom menu row** — styled like the host's own menu items (same spacing, muted color, hover); click it for a compact popover anchored just above the footer with today's cost, calls and quota.
-- **Details on demand** — `Ctrl+P` → **Usage: show report** opens the full dialog (top models + full quota), and `/usage` posts the 30-day table.
+- **`Usage` on the bottom menu row** — styled like the host's own menu items (same spacing, muted color, hover); click it for a compact popover anchored just above the footer: today's cost/calls/quota plus the top 5 models with names on the left and calls/cost right-aligned.
+- **Details on demand** — `Ctrl+P` → **Usage: show report** (the default command palette, no extra keybind) opens the full dialog with aligned model rows, and `/usage` posts the 30-day table.
 - **No chat/sidebar duplication** — the conversation footer and the task-detail sidebar stay clean.
 - **`/usage` command** — a full per-model table inside the session (no extra model call; it posts the report directly).
 - **`usage_report` tool** — the agent can answer "how much have I used / spent?" with the same numbers.
@@ -57,8 +57,8 @@ This installs the package into OpenCode's plugin cache and loads its `./tui` exp
 
 | What | How |
 | --- | --- |
-| Compact popover | Click `Usage` (right after `Experiments`) |
-| Detailed dialog | `Ctrl+P` → **Usage: show report** |
+| Compact popover | Click `Usage` (right after `Experiments`) — models left, usage right |
+| Detailed dialog | `Ctrl+P` → **Usage: show report** (default command palette) |
 | Full report (30 days) | `/usage` |
 | Custom window | `/usage --days 7`, `/usage --days 0` (today) |
 | Ask the agent | "show my model usage and cost" |
