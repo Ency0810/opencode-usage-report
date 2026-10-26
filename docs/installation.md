@@ -81,13 +81,13 @@ Expected shape:
 
 Then verify in the TUI:
 
-1. **Bottom menu row** — it reads `✓ Server  ○ UI  Theme  Tools  Experiments  usage`. Click `usage`: a dialog shows today's totals, remaining Antigravity quota, the top models and a `/usage` hint. (The row is host-owned and has no plugin slot, so the plugin draws an absolute overlay one cell after `Experiments`; it is hidden below 60 columns.)
-2. **Chat footer and task-detail sidebar** — intentionally clean; the plugin does not hook `prompt.footer.status` or `sidebar.footer`.
-3. **Command palette** — `Ctrl+P` → `Usage: show report` opens the same dialog anywhere.
+1. **Bottom menu row** — it reads `✓ Server  ○ UI  Theme  Tools  Experiments  Usage`, with the same two-space gap, muted color and hover highlight as the host items. Click `Usage`: a compact popover opens just above the footer with today's cost, calls and quota. Click outside or press `Esc` to close. (The row is host-owned and has no plugin slot, so the plugin draws an absolute overlay after `Experiments`; it is hidden below 60 columns.)
+2. **Detailed dialog** — `Ctrl+P` → `Usage: show report` opens the full dialog (top models, full quota, `/usage` hint). Details are intentionally keyboard-only.
+3. **Chat footer and task-detail sidebar** — intentionally clean; the plugin does not hook `prompt.footer.status` or `sidebar.footer`.
 4. **In a session** — run `/usage`; a per-model table is posted directly into the conversation.
 5. Optionally ask the agent: "show my model usage" — it should call `usage_report`.
 
-If the `usage` entry is missing but `status.json` exists, the CLI plugin didn't load (or the terminal is narrower than 60 columns) — see Troubleshooting.
+If the `Usage` entry is missing but `status.json` exists, the CLI plugin didn't load (or the terminal is narrower than 60 columns) — see Troubleshooting.
 
 ### Step 4 — Optional configuration
 
@@ -107,7 +107,7 @@ Set them in the user's shell startup file if they want a different location.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| `usage` entry missing from the bottom row | CLI plugin not loaded, or terminal narrower than 60 columns | Fully restart OpenCode and widen the terminal; use `Ctrl+P` → `Usage: show report` as a fallback |
+| `Usage` entry missing from the bottom row | CLI plugin not loaded, or terminal narrower than 60 columns | Fully restart OpenCode and widen the terminal; use `Ctrl+P` → `Usage: show report` as a fallback |
 | `usage` click does nothing | Snapshot not written yet | Run `/usage` once, then check `status.json`; restart OpenCode |
 | `/usage` says command not found | Server plugin not discovered | Confirm the files are at `~/.config/opencode/plugins/usage-report/{index.ts,tui.tsx}` and restart |
 | No quota line | `opencode-antigravity-auth` not installed, or accounts file missing | Install that plugin and sign in; or ignore, usage still works |

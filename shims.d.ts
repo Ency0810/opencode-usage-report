@@ -8,6 +8,7 @@ declare module "@opencode/plugin/tui" {
 
 declare module "@opentui/core" {
   export const TextRenderable: any
+  export const BoxRenderable: any
 }
 
 declare namespace JSX {

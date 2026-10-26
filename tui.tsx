@@ -1,14 +1,14 @@
 /**
- * usage-report TUI — a clickable `usage` entry on the bottom-most menu row.
+ * usage-report TUI — a `Usage` entry on the bottom-most menu row.
  *
- * The host owns that row (`Server / UI / Theme / Tools / Experiments`) and does
- * not expose a slot for it, so this draws an absolute overlay right after the
- * menu text. Everything else lives behind the click / palette command.
+ * Click: a small popover anchored just above the footer (like the host's `UI`
+ * menu). Keyboard (palette: "Usage: show report"): the detailed dialog.
  *
- * Reads the snapshot written by ./index.ts; no network or server calls.
+ * The host owns that row and exposes no plugin slot, so the entry is drawn as an
+ * absolute overlay one cell after `Experiments`.
  */
 import { Plugin } from "@opencode/plugin/tui"
-import { TextRenderable } from "@opentui/core"
+import { BoxRenderable, TextRenderable } from "@opentui/core"
 
 type QuotaBucket = { name: string; percent: number; reset: string }
 type QuotaAccount = { email: string; buckets: QuotaBucket[] }
@@ -29,17 +29,40 @@ const compactTokens = (n: number) =>
   n >= 1_000_000 ? `${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `${(n / 1_000).toFixed(0)}K` : String(n)
 const shortModel = (key: string) => key.replace("google/antigravity-", "").replace(/^google\//, "")
 
-// " ✓ Server  ○ UI  Theme  Tools  Experiments" occupies columns 0..41 in the
-// host footer row. Draw one cell after it.
+// " ✓ Server  ○ UI  Theme  Tools  Experiments" ends at column 41.
 const MENU_END = 42
 const MIN_COLUMNS = 60
 
 export default Plugin.define({
   id: "usage-report.tui",
   async setup(context) {
+    const renderer: any = context.renderer
+    const theme: any = context.theme
+    const muted = theme?.text?.muted
+    const base = theme?.text?.base
+    const borderColor = theme?.border?.base
+    const raised = theme?.background?.raised?.base
+
     let current: Snapshot | null = null
     let timer: ReturnType<typeof setInterval> | undefined
-    const renderer: any = context.renderer
+    let popupOpen = false
+    let popup: any = null
+    let backdrop: any = null
+
+    const refresh = async () => {
+      try {
+        const fs = await import("node:fs/promises")
+        const os = await import("node:os")
+        const path = await import("node:path")
+        const dir =
+          process.env.OPENCODE_USAGE_REPORT_DIR ??
+          path.join(os.homedir(), ".cache", "opencode", "usage-report")
+        const file = process.env.OPENCODE_USAGE_REPORT_STATUS ?? path.join(dir, "status.json")
+        current = JSON.parse(await fs.readFile(file, "utf8"))
+      } catch {
+        current = null
+      }
+    }
 
     const summary = (s: Snapshot): string => {
       const out: string[] = []
@@ -64,22 +87,7 @@ export default Plugin.define({
       return out.join("\n")
     }
 
-    const refresh = async () => {
-      try {
-        const fs = await import("node:fs/promises")
-        const os = await import("node:os")
-        const path = await import("node:path")
-        const dir =
-          process.env.OPENCODE_USAGE_REPORT_DIR ??
-          path.join(os.homedir(), ".cache", "opencode", "usage-report")
-        const file = process.env.OPENCODE_USAGE_REPORT_STATUS ?? path.join(dir, "status.json")
-        current = JSON.parse(await fs.readFile(file, "utf8"))
-      } catch {
-        current = null
-      }
-    }
-
-    const showReport = async () => {
+    const showDetails = async () => {
       if (!current) await refresh()
       if (!current) {
         context.ui.toast.show({ message: "Usage snapshot is not ready yet", variant: "warning" })
@@ -88,31 +96,123 @@ export default Plugin.define({
       await context.ui.dialog.alert({ title: "Model usage — today", message: summary(current) })
     }
 
+    const closePopup = () => {
+      if (backdrop) {
+        try {
+          renderer.root.remove?.(backdrop)
+          backdrop.destroy?.()
+        } catch {
+          // best effort
+        }
+        backdrop = null
+      }
+      if (popup) {
+        try {
+          renderer.root.remove?.(popup)
+          popup.destroy?.()
+        } catch {
+          // best effort
+        }
+        popup = null
+      }
+      popupOpen = false
+      renderer.requestRender?.()
+    }
+
+    const openPopup = async () => {
+      closePopup()
+      if (!current) await refresh()
+
+      const s = current
+      const buckets = (s?.quota ?? []).flatMap((a) => a.buckets ?? []).slice(0, 3)
+      const lines = [
+        `Today   ${money(s?.cost ?? 0)} · ${count(s?.calls ?? 0)} calls`,
+        buckets.length > 0 ? buckets.map((b) => `${b.name} ${b.percent}%`).join(" · ") : "no quota data",
+        "Ctrl+P → details",
+      ]
+      const width = Math.max(...lines.map((line) => line.length)) + 4
+      const cols = (process.stdout as any).columns ?? 80
+      const left = Math.max(1, Math.min(MENU_END + 2, cols - width - 1))
+
+      backdrop = new BoxRenderable(renderer, {
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 1000,
+        onMouseUp: () => closePopup(),
+      })
+
+      popup = new BoxRenderable(renderer, {
+        position: "absolute",
+        left,
+        bottom: 1,
+        width,
+        height: lines.length + 2,
+        zIndex: 1001,
+        border: true,
+        flexDirection: "column",
+        paddingLeft: 1,
+        paddingRight: 1,
+        ...(borderColor ? { borderColor } : {}),
+        ...(raised ? { backgroundColor: raised } : {}),
+      })
+
+      for (const line of lines) {
+        popup.add(
+          new TextRenderable(renderer, {
+            content: line,
+            selectable: false,
+            ...(base ? { fg: base } : {}),
+          }),
+        )
+      }
+
+      renderer.root.add(backdrop)
+      renderer.root.add(popup)
+      popupOpen = true
+      renderer.requestRender?.()
+    }
+
     await refresh()
     timer = setInterval(() => void refresh(), 15_000)
 
-    const overlay = new TextRenderable(renderer, {
-      content: "usage",
+    const entry = new TextRenderable(renderer, {
+      content: "Usage",
       position: "absolute",
-      left: MENU_END + 1,
+      left: MENU_END + 2,
       bottom: 0,
       zIndex: 999,
       selectable: false,
+      ...(muted ? { fg: muted } : {}),
+      onMouseOver: () => {
+        if (base) entry.fg = base
+        renderer.requestRender?.()
+      },
+      onMouseOut: () => {
+        if (muted) entry.fg = muted
+        renderer.requestRender?.()
+      },
       onMouseUp: (event: any) => {
         event?.preventDefault?.()
-        void showReport()
+        if (popupOpen) closePopup()
+        else void openPopup()
       },
     })
 
     const place = () => {
       const cols = (process.stdout as any).columns ?? 80
-      overlay.visible = cols >= MIN_COLUMNS
-      overlay.left = MENU_END + 1
-      overlay.bottom = 0
+      entry.visible = cols >= MIN_COLUMNS
+      entry.left = MENU_END + 2
+      entry.bottom = 0
+      if (popupOpen) {
+        closePopup()
+      }
       renderer.requestRender?.()
     }
 
-    renderer.root.add(overlay)
+    renderer.root.add(entry)
     place()
     const onResize = () => place()
     process.stdout.on("resize", onResize)
@@ -126,7 +226,19 @@ export default Plugin.define({
           title: "Usage: show report",
           group: "Usage",
           palette: true,
-          run: () => void showReport(),
+          run: () => {
+            closePopup()
+            void showDetails()
+          },
+        },
+        {
+          id: "usage-report.close",
+          bind: "escape",
+          enabled: () => popupOpen,
+          run: () => {
+            closePopup()
+            return false
+          },
         },
       ],
     }))
@@ -134,9 +246,10 @@ export default Plugin.define({
     return () => {
       if (timer) clearInterval(timer)
       process.stdout.off("resize", onResize)
+      closePopup()
       try {
-        renderer.root.remove?.(overlay)
-        overlay.destroy?.()
+        renderer.root.remove?.(entry)
+        entry.destroy?.()
         renderer.requestRender?.()
       } catch {
         // best effort

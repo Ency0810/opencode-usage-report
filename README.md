@@ -8,8 +8,9 @@ today · $0.20 · 379 calls · claude 80%
 
 ## Features
 
-- **Clickable `usage` on the bottom menu row** — drawn right after `Experiments`; click it (or run the palette command **Usage: show report**) for today's cost, calls, tokens, remaining Antigravity quota and top models.
-- **No chat/sidebar duplication** — the conversation footer and the task-detail sidebar stay clean; the full table is behind `/usage`.
+- **`Usage` on the bottom menu row** — styled like the host's own menu items (same spacing, muted color, hover); click it for a compact popover anchored just above the footer with today's cost, calls and quota.
+- **Details on demand** — `Ctrl+P` → **Usage: show report** opens the full dialog (top models + full quota), and `/usage` posts the 30-day table.
+- **No chat/sidebar duplication** — the conversation footer and the task-detail sidebar stay clean.
 - **`/usage` command** — a full per-model table inside the session (no extra model call; it posts the report directly).
 - **`usage_report` tool** — the agent can answer "how much have I used / spent?" with the same numbers.
 - **Per-model breakdown** — calls, input / output / reasoning tokens, cache read/write, and estimated cost.
@@ -56,8 +57,8 @@ This installs the package into OpenCode's plugin cache and loads its `./tui` exp
 
 | What | How |
 | --- | --- |
-| Bottom menu row | Click `usage` (right after `Experiments`) |
-| Command palette | `Ctrl+P` → **Usage: show report** |
+| Compact popover | Click `Usage` (right after `Experiments`) |
+| Detailed dialog | `Ctrl+P` → **Usage: show report** |
 | Full report (30 days) | `/usage` |
 | Custom window | `/usage --days 7`, `/usage --days 0` (today) |
 | Ask the agent | "show my model usage and cost" |
@@ -75,7 +76,8 @@ Example report:
 
 ## Where it appears
 
-- **Bottom menu row** (`✓ Server  ○ UI  Theme  Tools  Experiments  usage`): the host owns that row and exposes no plugin slot for it, so the plugin draws a small absolute overlay one cell after `Experiments`. It is hidden on terminals narrower than 60 columns.
+- **Bottom menu row** (`✓ Server  ○ UI  Theme  Tools  Experiments  Usage`): the host owns that row and exposes no plugin slot for it, so the plugin draws an absolute overlay after `Experiments`, with the same two-space gap, muted color and hover highlight as the host items. It is hidden on terminals narrower than 60 columns.
+- **Click** opens a compact popover anchored above the footer (like the host's `UI` menu); clicking outside or pressing `Esc` closes it. **Details stay behind the keyboard shortcut.**
 - **Conversation footer and task-detail sidebar**: intentionally untouched (`prompt.footer.status` and `sidebar.footer` are not used).
 - **Command palette**: `Ctrl+P` → “Usage: show report” works anywhere and does not depend on the overlay.
 - **Data**: the entry only opens a dialog; the numbers live in the dialog and in `/usage`.
