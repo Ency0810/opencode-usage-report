@@ -6,8 +6,8 @@ It has two parts that must both land on disk:
 
 | File | Role |
 | --- | --- |
-| `index.ts` | Server plugin: `usage_report` tool, `/usage` command, writes the footer snapshot |
-| `tui.tsx` | CLI/TUI plugin: renders the footer status line |
+| `index.ts` | Server plugin: `usage_report` tool, `/usage` command, writes the TUI snapshot |
+| `tui.tsx` | CLI/TUI plugin: draws the clickable `usage` entry on the bottom menu row |
 
 OpenCode discovers a plugin directory under `~/.config/opencode/plugins/<name>/` automatically. **Do not** add anything to `opencode.json` for this method.
 
@@ -62,7 +62,7 @@ This installs the package into OpenCode's plugin cache and loads its `./tui` exp
 opencode reload
 ```
 
-A full restart of the TUI is required for the CLI (footer) plugin to attach. Tell the user to restart OpenCode after this step.
+A full restart of the TUI is required for the CLI overlay to attach. Tell the user to restart OpenCode after this step.
 
 ### Step 3 — Verify
 
@@ -81,13 +81,13 @@ Expected shape:
 
 Then verify in the TUI:
 
-1. **Home footer** — a clickable `usage` entry appears in the status row (next to the MCP indicator). Click it: a dialog shows today's totals, remaining Antigravity quota, and the top models. The `Server / UI / Theme / Tools / Experiments` row is host-owned and has no plugin slot, so the entry lives in the status row next to it.
-2. **Session task-detail sidebar** — the right panel shows `today · $0.20 · 379 calls · claude 80%`. The chat footer is intentionally left clean (no `prompt.footer.status` hook).
-3. **Command palette** — `Ctrl+P` → `Usage: show report` opens the same dialog anywhere, including when the sidebar is closed.
+1. **Bottom menu row** — it reads `✓ Server  ○ UI  Theme  Tools  Experiments  usage`. Click `usage`: a dialog shows today's totals, remaining Antigravity quota, the top models and a `/usage` hint. (The row is host-owned and has no plugin slot, so the plugin draws an absolute overlay one cell after `Experiments`; it is hidden below 60 columns.)
+2. **Chat footer and task-detail sidebar** — intentionally clean; the plugin does not hook `prompt.footer.status` or `sidebar.footer`.
+3. **Command palette** — `Ctrl+P` → `Usage: show report` opens the same dialog anywhere.
 4. **In a session** — run `/usage`; a per-model table is posted directly into the conversation.
 5. Optionally ask the agent: "show my model usage" — it should call `usage_report`.
 
-If the home `usage` entry is missing but `status.json` exists, the CLI plugin didn't load — see Troubleshooting.
+If the `usage` entry is missing but `status.json` exists, the CLI plugin didn't load (or the terminal is narrower than 60 columns) — see Troubleshooting.
 
 ### Step 4 — Optional configuration
 
@@ -107,12 +107,12 @@ Set them in the user's shell startup file if they want a different location.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Footer shows `usage …` forever | Snapshot not written yet, or `index.ts` not loaded | Run `/usage` once, then check `status.json`; restart OpenCode |
-| Footer missing entirely | CLI plugin not loaded (CLI plugins attach at TUI startup) | Fully restart OpenCode, not just reload |
+| `usage` entry missing from the bottom row | CLI plugin not loaded, or terminal narrower than 60 columns | Fully restart OpenCode and widen the terminal; use `Ctrl+P` → `Usage: show report` as a fallback |
+| `usage` click does nothing | Snapshot not written yet | Run `/usage` once, then check `status.json`; restart OpenCode |
 | `/usage` says command not found | Server plugin not discovered | Confirm the files are at `~/.config/opencode/plugins/usage-report/{index.ts,tui.tsx}` and restart |
 | No quota line | `opencode-antigravity-auth` not installed, or accounts file missing | Install that plugin and sign in; or ignore, usage still works |
 | Costs all `$0` | Only Antigravity/subscription models used | Expected — check the quota line instead |
-| Duplicate reports / duplicated footer | Both the two-file copy and the package install are active | Remove one: `opencode plugin remove opencode-usage-report` or delete the directory |
+| Duplicate reports / duplicated entry | Both the two-file copy and the package install are active | Remove one: `opencode plugin remove opencode-usage-report` or delete the directory |
 
 ## Uninstall
 

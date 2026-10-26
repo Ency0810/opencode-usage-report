@@ -8,8 +8,8 @@ today · $0.20 · 379 calls · claude 80%
 
 ## 功能
 
-- **右側任務詳情欄**：今天的估算成本、模型呼叫次數、Antigravity `claude` 配額剩餘百分比，每 15 秒更新；**不會佔用聊天底部**。
-- **首頁 footer 可點的 `usage`**：點一下（或命令面板 **Usage: show report**）就看摘要。
+- **最底部選單列的 `usage`**：畫在 `Experiments` 後面，點一下（或命令面板 **Usage: show report**）就看今天的成本、呼叫數、tokens、Antigravity 配額與前幾名模型。
+- **不佔用聊天與側欄**：對話底部與右側任務詳情欄都保持乾淨；完整表格用 `/usage`。
 - **`/usage` 指令**：在對話中直接貼出每個模型的完整用量表（不會額外呼叫模型）。
 - **`usage_report` 工具**：可以直接問 agent「我用了多少 / 花多少錢」。
 - **逐模型明細**：呼叫次數、input / output / reasoning tokens、cache read/write、估算成本。
@@ -56,8 +56,7 @@ opencode plugin add github:Ency0810/opencode-usage-report
 
 | 想做什麼 | 怎麼做 |
 | --- | --- |
-| 首頁 footer | 點 `usage` 看摘要 |
-| 右側任務詳情欄 | 開 session 時自動顯示 |
+| 最底部選單列 | 點 `Experiments` 後面的 `usage` |
 | 命令面板 | `Ctrl+P` → **Usage: show report** |
 | 完整報表（30 天） | `/usage` |
 | 自訂期間 | `/usage --days 7`、`/usage --days 0`（今天） |
@@ -66,10 +65,10 @@ opencode plugin add github:Ency0810/opencode-usage-report
 
 ## 顯示位置
 
-- **首頁 footer 狀態列**：可點的 `usage`。`Server / UI / Theme / Tools / Experiments` 那一排由 OpenCode 主機自己管理，插件沒有對應的 slot，所以掛在緊鄰的狀態列。
-- **Session 右側任務詳情欄**（`sidebar.footer`）：完整 `today · $… · N calls · claude N%`。
-- **聊天底部不顯示**：刻意不掛 `prompt.footer.status`，保持對話區乾淨。
-- **命令面板**：`Ctrl+P` →「Usage: show report」，側欄收起時也能用。
+- **最底部選單列**（`✓ Server  ○ UI  Theme  Tools  Experiments  usage`）：那一列由 OpenCode 主機管理，插件沒有 slot，所以用絕對定位 overlay 畫在 `Experiments` 後一格；終端寬度小於 60 欄時自動隱藏。
+- **聊天底部與右側任務詳情欄**：刻意不使用（`prompt.footer.status`、`sidebar.footer` 都沒掛）。
+- **命令面板**：`Ctrl+P` →「Usage: show report」，不依賴 overlay。
+- **數字只在**點開的對話框與 `/usage` 裡。
 
 ## 成本怎麼算
 
