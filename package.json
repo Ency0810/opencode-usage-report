@@ -1,0 +1,36 @@
+{
+  "name": "opencode-usage-report",
+  "version": "0.1.0",
+  "description": "Per-model token usage, cost and Antigravity quota for OpenCode: /usage command, usage_report tool, and a TUI footer status line.",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./tui": "./tui.tsx"
+  },
+  "files": [
+    "index.ts",
+    "tui.tsx",
+    "README.md",
+    "README.zh-TW.md",
+    "docs",
+    "LICENSE"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "usage",
+    "cost",
+    "tokens",
+    "antigravity",
+    "statusline"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ency0810/opencode-usage-report.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ency0810/opencode-usage-report/issues"
+  },
+  "homepage": "https://github.com/Ency0810/opencode-usage-report#readme"
+}
